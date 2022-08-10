@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import z from "zod";
-import {cube, sphere, cuboid} from "@jscad/modeling/src/primitives";
+import {cuboid} from "@jscad/modeling/src/primitives";
 // @ts-ignore
 import * as serializer from "@jscad/stl-serializer"
 import {Renderer} from "jscad-react";
 import {forceDownloadBlob} from "./util";
 import {AutoForm} from "./autoform";
 import './App.css';
+import {Geom3} from "@jscad/modeling/src/geometries/types";
 
 export const BoxSchema = z.object({
     width:z.number(),
@@ -16,39 +17,34 @@ export const BoxSchema = z.object({
 type Box = z.infer<typeof BoxSchema>;
 
 
+function box_to_solids(new_box:Box):Geom3[] {
+    return [
+        cuboid({size: [ new_box.width, new_box.height, new_box.depth ]})
+    ]
+}
+
+const start_box:Box = BoxSchema.parse({
+    width:10,
+    height:5,
+    depth:5,
+})
+
 function App() {
-    const [solids, set_solids] = useState<any[]>([cube({size:12, center:[0,0,6]})])
-    const [box, set_box] = useState<Box>(() => {
-        return BoxSchema.parse({
-            width:10,
-            height:5,
-            depth:5,
-        })
-    })
-    const switch_sphere = () => set_solids([sphere({radius:5, center:[0,0,6]})])
-    const switch_cube = () => set_solids([cube({size: 10, center: [0, 0, 6]})])
+    const [box, set_box] = useState<Box>(start_box)
+    const [solids, set_solids] = useState(()=>box_to_solids(box))
     const export_stl = () => {
         const rawData = serializer.serialize({binary:true},solids)
         const blob = new Blob(rawData,{type:"model/stl"})
         forceDownloadBlob("sphere.stl",blob)
     }
     const update_box = (new_box:Box) => {
-        set_solids([cuboid({
-            size:[
-                new_box.width,new_box.height,new_box.depth
-            ]
-        })])
+        set_solids(box_to_solids(new_box))
         set_box(new_box)
     }
     return <div>
-        <button onClick={switch_sphere}>sphere</button>
-        <button onClick={switch_cube}>cube</button>
+        <AutoForm object={box} schema={BoxSchema} onChange={update_box}/>
+        <Renderer solids={solids}  width={800} height={450}/>
         <button onClick={export_stl}>to STL</button>
-        <AutoForm
-            object={box}
-            schema={BoxSchema}
-            onChange={update_box}/>
-        <Renderer solids={solids} height={300} width={500}/>
     </div>
 }
 
