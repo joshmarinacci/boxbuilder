@@ -189,10 +189,10 @@ function ObjectInput<T extends ZodObject<any>>(props: {
     </div>
 }
 
-export function AutoForm(props: {
+export function AutoForm<T>(props: {
     schema: any,
     object: any
-    onChange: (v: any) => void
+    onChange: (v: T) => void
 }) {
     // console.log("auto form object is",props.schema, props.object)
     return <div className="auto-form">
