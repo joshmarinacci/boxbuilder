@@ -19,9 +19,16 @@ export function start_doc<T>(schema: ZodSchema, backup: object): T {
     return start_box
 }
 
+let debounce_timer:any
+function debounce(callback:any, time:number) {
+    clearTimeout(debounce_timer)
+    debounce_timer = setTimeout(callback,time)
+}
 export function save_doc<T>(new_box: T) {
-    let str = encodeURIComponent(JSON.stringify(new_box))
-    window.history.pushState(new_box, 'box-state', "?data=" + str)
+    debounce(()=>{
+        let str = encodeURIComponent(JSON.stringify(new_box))
+        window.history.pushState(new_box, 'box-state', "?data=" + str)
+    },1000)
 }
 
 export function useHistoryDoc<A>(schema: ZodSchema, default_box: any): [A, (a: A) => void] {
