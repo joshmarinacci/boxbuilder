@@ -9,21 +9,25 @@ function NumberInput<T extends ZodNumber>(props: {
     onChange: (n: number) => void,
     range: boolean
 }) {
+    let scale = 1
+    if(!props.schema.isInt) {
+        scale = 10
+    }
     const update = (e:ChangeEvent<HTMLInputElement>) => {
         if (props.schema.isInt) {
             let v = parseInt(e.target.value)
             props.onChange(v)
         } else {
             let v = parseFloat(e.target.value)
-            props.onChange(v)
+            props.onChange(v/scale)
         }
     }
     return <input
         // type={props.range?"range":"number"}
         type={"range"}
-        value={props.value}
-        min={props.schema.minValue !== null ? props.schema.minValue : undefined}
-        max={props.schema.maxValue !== null ? props.schema.maxValue : undefined}
+        value={props.value*scale}
+        min={props.schema.minValue !== null ? props.schema.minValue*scale : undefined}
+        max={props.schema.maxValue !== null ? props.schema.maxValue*scale : undefined}
         onChange={update}
     />
 }

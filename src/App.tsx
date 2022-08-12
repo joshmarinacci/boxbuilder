@@ -13,11 +13,11 @@ import {subtract,union} from "@jscad/modeling/src/operations/booleans";
 import {transforms} from "@jscad/modeling";
 
 export const BoxSchema = z.object({
-    width:z.number(),
-    height:z.number(),
-    depth:z.number(),
-    thickness:z.number().min(1).max(5),
-    cornerRadius:z.number().min(1).max(5),
+    width:z.number().min(1).int(),
+    height:z.number().min(1).int(),
+    depth:z.number().min(1).int(),
+    thickness:z.number().min(0.1).max(5),
+    // cornerRadius:z.number().min(1).max(5),
 })
 type Box = z.infer<typeof BoxSchema>;
 const default_box = {
@@ -25,7 +25,7 @@ const default_box = {
     height:5,
     depth:5,
     thickness:2,
-    cornerRadius:2,
+    // cornerRadius:2,
 }
 
 function min(numbers: number[]):number {
@@ -40,7 +40,7 @@ function box_to_solids(box:Box):Geometry[] {
     let gap = 3
     let lid = 5
     // corner radius must be smaller than half the box dimensions
-    let corner = min([box.width/2,box.depth/2,box.height/2,box.cornerRadius])
+    // let corner = min([box.width/2,box.depth/2,box.height/2,box.cornerRadius])
     //thickness must be less than box dimensions
     let thick = min([box.thickness, box.width-0.1])
 
