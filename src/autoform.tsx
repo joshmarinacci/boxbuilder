@@ -1,5 +1,5 @@
-import {ZodArray, ZodEffects, ZodEnum, ZodNumber, ZodObject, ZodString, ZodType} from "zod";
-import React, {useState, MouseEvent, ChangeEvent} from "react";
+import {ZodArray, ZodEffects, ZodEnum, ZodNumber, ZodObject, ZodString} from "zod";
+import React, {useState, ChangeEvent} from "react";
 import {HBox} from "./common";
 
 function NumberInput<T extends ZodNumber>(props: {

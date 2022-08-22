@@ -49,6 +49,6 @@ export function useHistoryDoc<A>(schema: ZodSchema, default_box: any): [A, (a: A
         return () => {
             window.removeEventListener("popstate", history_changed)
         }
-    }, [window])
+    })
     return [box, do_set_box]
 }

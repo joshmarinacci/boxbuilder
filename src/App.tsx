@@ -6,7 +6,7 @@ import {Renderer} from "jscad-react";
 import {forceDownloadBlob} from "./util";
 import {AutoForm} from "./autoform";
 import './App.css';
-import {cuboid, roundedCuboid} from "@jscad/modeling/src/primitives";
+import {cuboid} from "@jscad/modeling/src/primitives";
 import {Geometry} from "@jscad/modeling/src/geometries/types";
 import {useHistoryDoc} from "./schema";
 import {subtract,union} from "@jscad/modeling/src/operations/booleans";
@@ -40,7 +40,7 @@ function box_to_solids(box:Box):Geometry[] {
     let gap = 3
     let lid = 5
     // corner radius must be smaller than half the box dimensions
-    let corner = min([box.width/2,box.depth/2,box.height/2,box.cornerRadius])
+    // let corner = min([box.width/2,box.depth/2,box.height/2,box.cornerRadius])
     //thickness must be less than box dimensions
     let thick = min([box.thickness, box.width-0.1])
 
