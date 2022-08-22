@@ -2,6 +2,7 @@
   "name": "boxbuilder",
   "version": "0.1.0",
   "private": true,
+  "homepage":"https://joshmarinacci.github.io/boxbuilder",
   "dependencies": {
     "@jscad/modeling": "2.2.0",
     "@jscad/stl-serializer": "^2.1.11",
