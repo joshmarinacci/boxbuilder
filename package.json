@@ -2,7 +2,7 @@
   "name": "boxbuilder",
   "version": "0.1.0",
   "private": true,
-  "homepage":"https://joshmarinacci.github.io/boxbuilder",
+  "homepage": "https://joshmarinacci.github.io/boxbuilder",
   "dependencies": {
     "@jscad/modeling": "2.2.0",
     "@jscad/stl-serializer": "^2.1.11",
@@ -13,6 +13,7 @@
     "@types/node": "^16.11.47",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
+    "gh-pages": "^4.0.0",
     "jscad-react": "^0.1.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -28,6 +29,8 @@
     "typescript": "4.7.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
