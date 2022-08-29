@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/boxbuilder/static/css/main.c23a5f9d.css",
-    "main.js": "/boxbuilder/static/js/main.69a264f9.js",
+    "main.js": "/boxbuilder/static/js/main.e8c6ac43.js",
     "index.html": "/boxbuilder/index.html",
     "main.c23a5f9d.css.map": "/boxbuilder/static/css/main.c23a5f9d.css.map",
-    "main.69a264f9.js.map": "/boxbuilder/static/js/main.69a264f9.js.map"
+    "main.e8c6ac43.js.map": "/boxbuilder/static/js/main.e8c6ac43.js.map"
   },
   "entrypoints": [
     "static/css/main.c23a5f9d.css",
-    "static/js/main.69a264f9.js"
+    "static/js/main.e8c6ac43.js"
   ]
 }
