@@ -43,7 +43,7 @@ function min(numbers: number[]):number {
 function box_to_solids(box:Box):Geometry[] {
     // gap between the two shapes
     let gap = 3
-    let lid = box.lidThickness
+    let lid_thick = box.lidThickness
     // corner radius must be smaller than half the box dimensions
     let corner = min([box.width/2,box.depth/2,box.height/2,box.cornerRadius])
     //thickness must be less than box dimensions
@@ -68,17 +68,23 @@ function box_to_solids(box:Box):Geometry[] {
         ),
         // the lid
         transforms.translate(
-            [box.width/2+gap,0,lid/2],
+            [box.width/2+gap,0,lid_thick/2],
             union(
+                subtract(
+                    cuboid({
+                        size:[box.width-thick-lid_tol, box.depth-thick-lid_tol, lid_thick],
+                    }),
+                    cuboid({
+                        size:[box.width-thick-lid_tol-thick, box.depth-thick-lid_tol-thick, 20],
+                        center:[0,0,-lid_thick/2/2 + lid_thick/2],
+                    })
+                ),
                 cuboid({
-                    size:[box.width-thick-lid_tol, box.depth-thick-lid_tol, lid],
-                }),
-                cuboid({
-                    size:[box.width, box.depth, lid/2],
-                    center:[0,0,-lid/2/2],
+                    size:[box.width, box.depth, lid_thick/2],
+                    center:[0,0,-lid_thick/2/2],
                 }),
             )
-        ),
+        )
         ]
     } catch (e) {
         console.log(e)
