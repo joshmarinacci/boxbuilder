@@ -2,7 +2,7 @@ import {ZodArray, ZodEffects, ZodEnum, ZodNumber, ZodObject, ZodString} from "zo
 import React, {useState, ChangeEvent} from "react";
 import {HBox} from "./common";
 
-function NumberInput<T extends ZodNumber>(props: {
+function RangeNumberInput<T extends ZodNumber>(props: {
     schema: T,
     value: number,
     name: string,
@@ -25,6 +25,36 @@ function NumberInput<T extends ZodNumber>(props: {
     return <input
         // type={props.range?"range":"number"}
         type={"range"}
+        value={props.value*scale}
+        min={props.schema.minValue !== null ? props.schema.minValue*scale : undefined}
+        max={props.schema.maxValue !== null ? props.schema.maxValue*scale : undefined}
+        onChange={update}
+    />
+}
+
+function TextNumberInput<T extends ZodNumber>(props: {
+    schema: T,
+    value: number,
+    name: string,
+    onChange: (n: number) => void,
+    range: boolean
+}) {
+    let scale = 1
+    if(!props.schema.isInt) {
+        scale = 10
+    }
+    const update = (e:ChangeEvent<HTMLInputElement>) => {
+        if (props.schema.isInt) {
+            let v = parseInt(e.target.value)
+            props.onChange(v)
+        } else {
+            let v = parseFloat(e.target.value)
+            props.onChange(v/scale)
+        }
+    }
+    return <input
+        // type={props.range?"range":"number"}
+        type={"number"}
         value={props.value*scale}
         min={props.schema.minValue !== null ? props.schema.minValue*scale : undefined}
         max={props.schema.maxValue !== null ? props.schema.maxValue*scale : undefined}
@@ -121,13 +151,19 @@ function ObjectInput<T extends ZodObject<any>>(props: {
             if (v instanceof ZodNumber) {
                 return <div className={'row'} key={k}>
                     <label>{k}</label>
-                    <NumberInput range={false}
-                                 schema={v}
-                                 name={k}
-                                 value={props.object[k]}
-                                 onChange={(v) => update_object_property(k, v)}
+                    <RangeNumberInput range={false}
+                                      schema={v}
+                                      name={k}
+                                      value={props.object[k]}
+                                      onChange={(v) => update_object_property(k, v)}
                     />
-                    <label className={'value'}>{props.object[k]}</label>
+                    <TextNumberInput range={false}
+                                      schema={v}
+                                      name={k}
+                                      value={props.object[k]}
+                                      onChange={(v) => update_object_property(k, v)}
+                    />
+                    {/*<label className={'value'}>{props.object[k]}</label>*/}
                     <i>mm</i>
                 </div>
             }

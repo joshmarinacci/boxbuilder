@@ -68,6 +68,9 @@ nav, .auto-form, aside {
   justify-self: end;
   padding-right: 0.5rem;
 }
+.row input {
+  margin-right: 0.25rem;
+}
 
 
 aside table {
