@@ -87,11 +87,32 @@ const export_stl = (solids:Geometry[]) => {
 function App() {
     const [box, set_box] = useHistoryDoc<Box>(BoxSchema, default_box)
     const solids = box_to_solids(box)
-    return <div>
+    return <main>
+        <h1>Simple STL Box Generator</h1>
+        <h2>For 3D printers</h2>
         <AutoForm object={box} schema={BoxSchema} onChange={set_box}/>
-        <Renderer solids={solids}  width={800} height={450}/>
-        <button onClick={()=>export_stl(solids)}>to STL</button>
-    </div>
+        <nav>
+            <button onClick={() => export_stl(solids)}>Generate STL</button>
+            <a href={"https://github.com/joshmarinacci/boxbuilder"}>GitHub source</a>
+        </nav>
+        <Renderer solids={solids} width={800} height={450}/>
+        <aside>
+            <table>
+                <tr>
+                    <th>action</th> <th>gesture</th>
+                </tr>
+                <tr>
+                    <td>rotate</td> <td>left mouse drag</td>
+                </tr>
+                <tr>
+                    <td>pan</td> <td>shift left mouse drag</td>
+                </tr>
+                <tr>
+                    <td>zoom</td> <td>scroll wheel</td>
+                </tr>
+            </table>
+        </aside>
+    </main>
 }
 
 export default App;

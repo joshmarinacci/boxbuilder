@@ -1,4 +1,85 @@
 body {
   background-color: midnightblue;
   color: white;
+  --radius: 0.25rem;
+}
+
+main {
+  border: 0px solid red;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1, h2 {
+  margin:0.5rem;
+  padding: 0;
+}
+
+nav {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid black;
+  background-color: white;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+nav > * {
+  padding: 0.5rem;
+}
+
+
+
+.auto-form, aside {
+  border: 1px solid black;
+  background-color: white;
+  color: black;
+  padding: 1rem;
+  margin: 0.5rem;
+}
+
+nav, .auto-form, aside {
+  border-radius: var(--radius);
+}
+
+.auto-form .object-input {
+  display: grid;
+  grid-template-columns: 1fr 2fr 3rem 3rem;
+  min-width: 300px;
+}
+
+.row {
+  border: 0px solid blue;
+  display: grid;
+  grid-column: 1 / span 4;
+  grid-template-columns: subgrid;
+  margin: 0.5rem;
+}
+.row :first-child {
+  border: 0px solid green;
+  justify-self: end;
+  padding-right: 0.5rem;
+}
+.row :last-child {
+  border: 0px solid red;
+}
+
+.row .value {
+  justify-self: end;
+  padding-right: 0.5rem;
+}
+
+
+aside table {
+  border-collapse: collapse;
+  padding:0;
+  margin:0;
+}
+aside table th {
+  background-color: #cccccc;
+  padding: 0.25rem 0.5rem;
+}
+aside table td {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #cccccc;
 }

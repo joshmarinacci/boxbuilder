@@ -115,11 +115,11 @@ function ObjectInput<T extends ZodObject<any>>(props: {
         new_obj[k] = v
         props.onChange(new_obj)
     }
-    return <div>
+    return <div className={"object-input"}>
         {Object.entries(props.schema.shape).map(([k, v]) => {
             // console.log("child is",k,props.object[k],v)
             if (v instanceof ZodNumber) {
-                return <HBox key={k}>
+                return <div className={'row'} key={k}>
                     <label>{k}</label>
                     <NumberInput range={false}
                                  schema={v}
@@ -127,11 +127,12 @@ function ObjectInput<T extends ZodObject<any>>(props: {
                                  value={props.object[k]}
                                  onChange={(v) => update_object_property(k, v)}
                     />
-                    <label>{props.object[k]}</label>
-                </HBox>
+                    <label className={'value'}>{props.object[k]}</label>
+                    <i>mm</i>
+                </div>
             }
             if (v instanceof ZodString) {
-                return <HBox key={k}>
+                return <div className={'row'} key={k}>
                     <label>{k}</label>
                     <StringInput
                         schema={v as ZodString}
@@ -139,10 +140,10 @@ function ObjectInput<T extends ZodObject<any>>(props: {
                         value={props.object[k]}
                         onChange={(v) => update_object_property(k, v)}
                     />
-                </HBox>
+                </div>
             }
             if (v instanceof ZodEnum) {
-                return <HBox key={k}>
+                return <div className={'row'} key={k}>
                     <label>{k}</label>
                     <EnumInput
                         schema={v as ZodEnum<any>}
@@ -150,11 +151,11 @@ function ObjectInput<T extends ZodObject<any>>(props: {
                         value={props.object[k]}
                         onChange={(v) => update_object_property(k, v)}
                     />
-                </HBox>
+                </div>
             }
             if (v instanceof ZodArray) {
                 // console.log("v is array",v)
-                return <HBox key={k}>
+                return <div className={'row'} key={k}>
                     <label>{k}</label>
                     <ArrayInput
                         schema={v as ZodArray<any>}
@@ -162,10 +163,10 @@ function ObjectInput<T extends ZodObject<any>>(props: {
                         value={props.object[k] as any[]}
                         onChange={(v) => update_object_property(k, v)}
                     />
-                </HBox>
+                </div>
             }
             if (v instanceof ZodObject) {
-                return <HBox key={k}>
+                return <div className={'row'} key={k}>
                     <label>{k}</label>
                     <ObjectInput
                         schema={v as ZodObject<any>}
@@ -173,11 +174,11 @@ function ObjectInput<T extends ZodObject<any>>(props: {
                         object={props.object[k]}
                         onChange={(v) => update_object_property(k, v)}
                     />
-                </HBox>
+                </div>
             }
             if (v instanceof ZodEffects && v._def.schema instanceof ZodObject) {
                 // console.log('is a wrapped object')
-                return <HBox key={k}>
+                return <div className='row' key={k}>
                     <label>{k}</label>
                     <label>effect</label>
                     <ObjectInput
@@ -186,7 +187,7 @@ function ObjectInput<T extends ZodObject<any>>(props: {
                         object={props.object[k]}
                         onChange={(v) => update_object_property(k, v)}
                     />
-                </HBox>
+                </div>
             }
             return <div key={k}>child prop {k}</div>
         })}
