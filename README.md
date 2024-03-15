@@ -4,6 +4,8 @@ Web GUI tool to generate STLs of boxes with lids for 3D printing.
 
 See [the live app here](https://apps.josh.earth/boxbuilder/)
 
+![screenshot](images/stl-box-generator-screenshot.png)
+
 
 # How it works
 
