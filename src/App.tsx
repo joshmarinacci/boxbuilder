@@ -7,7 +7,7 @@ import {forceDownloadBlob} from "./util";
 import {AutoForm} from "./autoform";
 import './App.css';
 import {cuboid} from "@jscad/modeling/src/primitives";
-import {Geometry} from "@jscad/modeling/src/geometries/types";
+import {Geom3, Geometry} from "@jscad/modeling/src/geometries/types";
 import {useHistoryDoc} from "./schema";
 import {subtract,union} from "@jscad/modeling/src/operations/booleans";
 import {transforms} from "@jscad/modeling";
@@ -40,7 +40,7 @@ function min(numbers: number[]):number {
     return m
 }
 
-function box_to_solids(box:Box):Geometry[] {
+function box_to_solids(box:Box) {
     // gap between the two shapes
     let gap = 3
     let lid_thick = box.lidThickness
@@ -100,7 +100,7 @@ const export_stl = (solids:Geometry[]) => {
 
 function App() {
     const [box, set_box] = useHistoryDoc<Box>(BoxSchema, default_box)
-    const solids = box_to_solids(box)
+    const solids = box_to_solids(box) as Geom3[]
     return <main>
         <h1>Simple STL Box Generator</h1>
         <h2>For 3D printers</h2>
