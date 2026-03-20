@@ -39,8 +39,17 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-    <!-- Fathom - beautiful, simple website analytics -->
-    <script src="https://cdn.usefathom.com/script.js" data-site="BDEVWZXV" defer></script>
-    <!-- / Fathom -->
+    <script>
+      (function () {
+        const endpoint = "https://stats.josh.earth/api/track";
+        const payload = JSON.stringify({
+          url: window.location.href,
+          referrer: document.referrer,
+          timestamp: new Date().toISOString()
+        });
+
+        navigator.sendBeacon(endpoint, payload);
+      })();
+    </script>
   </body>
 </html>
