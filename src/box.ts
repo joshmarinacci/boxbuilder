@@ -23,7 +23,7 @@ export const DEFAULT_BOX: Box = {
     depth: 10,
     wallThickness: 2,
     lidThickness: 2,
-    lidTolerance: 2,
+    lidTolerance: 0.4,
     cornerRadius: 2,
 }
 
@@ -50,42 +50,39 @@ export function boxToSolids(box: Box): Geom3[] {
     // gap between the two shapes
     const gap = 3
     const lidThick = box.lidThickness
-    // thickness must be less than box dimensions
-    const thick = Math.min(box.wallThickness, box.width - 0.1, box.depth - 0.1)
+    // Wall thickness and lid tolerance are per side. Clamp walls so the cavity always has some room.
+    const thick = Math.min(box.wallThickness, (Math.min(box.width, box.depth) - 0.1) / 2)
     const lidTol = box.lidTolerance
-    // Each inner outline is the outer one inset by half its size reduction, and insetting a
-    // rounded rectangle by d shrinks its corner radius by d. That keeps walls an even thickness
-    // around the corners and keeps the lid insert the same shape as the opening it drops into.
+
+    // How much narrower than the outside each part is, counting both sides.
+    const cavityShrink = 2 * thick // the box's inside
+    const plugShrink = cavityShrink + 2 * lidTol // the lid's insert, a tolerance gap inside the cavity
+    const holeShrink = plugShrink + 2 * thick // the hole that turns the insert into a ring
+
+    // Each inner outline is the outer one inset by half its shrink, and insetting a rounded
+    // rectangle by d shrinks its corner radius by d. That keeps walls an even thickness around the
+    // corners and keeps the lid insert the same shape as the opening it drops into.
     const r = box.cornerRadius
-    const insetRadius = (sizeReduction: number) => Math.max(0, r - sizeReduction / 2)
-    const fits = (sizeReduction: number) => Math.min(box.width, box.depth) - sizeReduction > EPS
+    const insetRadius = (shrink: number) => Math.max(0, r - shrink / 2)
+    const fits = (shrink: number) => Math.min(box.width, box.depth) - shrink > EPS
+    const inset = (shrink: number, height: number, centerZ = 0) =>
+        roundedBlock(box.width - shrink, box.depth - shrink, height, insetRadius(shrink), centerZ)
 
     // The lid is a flat cap plus a ring that drops into the box opening. On small boxes with thick
     // walls there may be no room for the ring's hole (the ring becomes a solid plug), or for the
     // ring at all (the lid is just the cap).
     const lidCap = () => roundedBlock(box.width, box.depth, lidThick / 2, r, -lidThick / 2 / 2)
-    const lidPlug = () =>
-        roundedBlock(box.width - thick - lidTol, box.depth - thick - lidTol, lidThick, insetRadius(thick + lidTol))
-    const lidHole = () =>
-        roundedBlock(
-            box.width - thick - lidTol - thick,
-            box.depth - thick - lidTol - thick,
-            20,
-            insetRadius(2 * thick + lidTol),
-            -lidThick / 2 / 2 + lidThick / 2,
-        )
-    const lidRing = () => (fits(2 * thick + lidTol) ? subtract(lidPlug(), lidHole()) : lidPlug())
-    const lid = () => (fits(thick + lidTol) ? union(lidRing(), lidCap()) : lidCap())
+    const lidPlug = () => inset(plugShrink, lidThick)
+    const lidHole = () => inset(holeShrink, 20, -lidThick / 2 / 2 + lidThick / 2)
+    const lidRing = () => (fits(holeShrink) ? subtract(lidPlug(), lidHole()) : lidPlug())
+    const lid = () => (fits(plugShrink) ? union(lidRing(), lidCap()) : lidCap())
 
     try {
         return [
-            // the box
+            // the box: full-height cavity raised by `thick`, leaving a floor of that thickness
             translate(
                 [-box.width / 2 - gap, 0, box.height / 2],
-                subtract(
-                    roundedBlock(box.width, box.depth, box.height, r),
-                    roundedBlock(box.width - thick, box.depth - thick, box.height, insetRadius(thick), thick),
-                ),
+                subtract(roundedBlock(box.width, box.depth, box.height, r), inset(cavityShrink, box.height, thick)),
             ),
             // the lid
             translate([box.width / 2 + gap, 0, lidThick / 2], lid()),
