@@ -11,15 +11,16 @@ See [the live app here](https://apps.josh.earth/boxbuilder/)
 Drag the sliders (or type into the number boxes) and the preview updates live. All sizes are in mm.
 When it looks right, press **Download STL** to save `box.stl`.
 
-| Setting                | What it does                                                                                    |
-| ---------------------- | ----------------------------------------------------------------------------------------------- |
-| Width / Depth / Height | Outside size of the box.                                                                        |
-| Wall thickness         | Floor thickness. Each side wall is half of this (the cavity is `width − wall thickness` wide).  |
-| Lid thickness          | Total thickness of the lid: a flat cap plus a ring that drops into the box.                     |
-| Lid tolerance          | Gap between the lid's ring and the box walls. Increase it if the lid is too tight.              |
-| Corner radius          | Rounds the four vertical corners of the box and lid. The rim stays flat so the lid seats flush. |
+| Setting                | What it does                                                                                                                                               |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Width / Depth / Height | Outside size of the box.                                                                                                                                   |
+| Wall thickness         | Thickness of the floor, each side wall, and the lid's insert ring.                                                                                         |
+| Lid thickness          | Total thickness of the lid: a flat cap plus a ring that drops into the box.                                                                                |
+| Lid tolerance          | Gap on each side between the lid's ring and the box walls. 0.4 is a common starting point; increase it if the lid is too tight, decrease it if it's loose. |
+| Corner radius          | Rounds the four vertical corners of the box and lid. The rim stays flat so the lid seats flush.                                                            |
 
-The current settings are saved in the page URL, so you can bookmark or share a box.
+The current settings are saved in the page URL, so you can bookmark or share a box. Each edit becomes a
+browser history entry, so Back and Forward step through your changes.
 
 **Moving the preview:** drag to rotate, shift-drag to pan, scroll to zoom. On touch screens, drag
 with one finger and pinch with two. With the preview focused (click it or Tab to it), arrow keys

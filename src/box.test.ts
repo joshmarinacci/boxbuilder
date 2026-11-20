@@ -32,6 +32,42 @@ describe('boxToSolids', () => {
     })
 })
 
+describe('wall thickness and lid tolerance', () => {
+    // Exact area of a rounded rectangle; the meshes approximate the arcs with 16 segments per corner.
+    const area = (w: number, d: number, r: number) => w * d - (4 - Math.PI) * Math.max(0, r) ** 2
+    const box = {
+        width: 40,
+        depth: 30,
+        height: 20,
+        wallThickness: 1.5,
+        lidThickness: 2,
+        lidTolerance: 0.4,
+        cornerRadius: 5,
+    }
+    const t = box.wallThickness
+    const tol = box.lidTolerance
+
+    // Regression: each side wall used to be half the wall thickness.
+    it('makes every side wall and the floor wallThickness thick', () => {
+        const outer = area(box.width, box.depth, box.cornerRadius) * box.height
+        const cavity = area(box.width - 2 * t, box.depth - 2 * t, box.cornerRadius - t) * (box.height - t)
+        expect(measureVolume(boxToSolids(box)[0]) / (outer - cavity)).toBeCloseTo(1, 2)
+    })
+
+    // Regression: lid tolerance used to be the total gap, split between the two sides.
+    it('leaves lidTolerance of clearance on each side of the lid insert, whose ring is wallThickness thick', () => {
+        const capVolume = area(box.width, box.depth, box.cornerRadius) * (box.lidThickness / 2)
+        const plug = area(box.width - 2 * t - 2 * tol, box.depth - 2 * t - 2 * tol, box.cornerRadius - t - tol)
+        const hole = area(box.width - 4 * t - 2 * tol, box.depth - 4 * t - 2 * tol, box.cornerRadius - 2 * t - tol)
+        const ringAboveCap = (plug - hole) * (box.lidThickness / 2)
+        expect(measureVolume(boxToSolids(box)[1]) / (capVolume + ringAboveCap)).toBeCloseTo(1, 2)
+    })
+
+    it('defaults to a snug 0.4mm lid tolerance', () => {
+        expect(DEFAULT_BOX.lidTolerance).toBe(0.4)
+    })
+})
+
 describe('corner radius', () => {
     const big = { ...DEFAULT_BOX, width: 30, depth: 20, height: 15 }
 
