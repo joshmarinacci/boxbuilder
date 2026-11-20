@@ -1,132 +1,55 @@
-import React from 'react';
-import z from "zod";
-// @ts-ignore
-import * as serializer from "@jscad/stl-serializer"
-import {Renderer} from "jscad-react";
-import {forceDownloadBlob} from "./util";
-import {AutoForm} from "./autoform";
-import './App.css';
-import {cuboid} from "@jscad/modeling/src/primitives";
-import {Geom3, Geometry} from "@jscad/modeling/src/geometries/types";
-import {useHistoryDoc} from "./schema";
-import {subtract,union} from "@jscad/modeling/src/operations/booleans";
-import {transforms} from "@jscad/modeling";
-
-export const BoxSchema = z.object({
-    width:z.number().min(1).int(),
-    height:z.number().min(1).int(),
-    depth:z.number().min(1).int(),
-    wallThickness:z.number().min(0.1).max(5),
-    lidThickness: z.number().min(0.1).max(5),
-    lidTolerance: z.number().min(0.0).max(5),
-    cornerRadius:z.number().min(1).max(5),
-})
-type Box = z.infer<typeof BoxSchema>;
-const default_box = {
-    width:10,
-    height:10,
-    depth:10,
-    wallThickness:2,
-    lidThickness: 2,
-    lidTolerance: 2,
-    cornerRadius:2,
-}
-
-function min(numbers: number[]):number {
-    let m = numbers[0]
-    for(let v of numbers) {
-        m = Math.min(m,v)
-    }
-    return m
-}
-
-function box_to_solids(box:Box) {
-    // gap between the two shapes
-    let gap = 3
-    let lid_thick = box.lidThickness
-    // corner radius must be smaller than half the box dimensions
-    let corner = min([box.width/2,box.depth/2,box.height/2,box.cornerRadius])
-    //thickness must be less than box dimensions
-    let thick = min([box.wallThickness, box.width-0.1])
-    let lid_tol = box.lidTolerance
-
-    try {
-    return [
-        // the box
-        transforms.translate(
-     [-box.width/2-gap,0,box.height/2],
-            subtract(
-                cuboid({
-                    size: [ box.width, box.depth, box.height ],
-                    // roundRadius: corner,
-                }),
-                cuboid({
-                    size: [ box.width-thick, box.depth-thick, box.height ],
-                    center:[0,0,thick],
-                })
-            )
-        ),
-        // the lid
-        transforms.translate(
-            [box.width/2+gap,0,lid_thick/2],
-            union(
-                subtract(
-                    cuboid({
-                        size:[box.width-thick-lid_tol, box.depth-thick-lid_tol, lid_thick],
-                    }),
-                    cuboid({
-                        size:[box.width-thick-lid_tol-thick, box.depth-thick-lid_tol-thick, 20],
-                        center:[0,0,-lid_thick/2/2 + lid_thick/2],
-                    })
-                ),
-                cuboid({
-                    size:[box.width, box.depth, lid_thick/2],
-                    center:[0,0,-lid_thick/2/2],
-                }),
-            )
-        )
-        ]
-    } catch (e) {
-        console.log(e)
-        return [cuboid({size:[1,1,1]})]
-    }
-
-}
-const export_stl = (solids:Geometry[]) => {
-    const rawData = serializer.serialize({binary:true},solids)
-    const blob = new Blob(rawData,{type:"model/stl"})
-    forceDownloadBlob("box.stl",blob)
-}
+import { useMemo } from 'react'
+import { forceDownloadBlob } from './util'
+import { AutoForm } from './autoform'
+import { useHistoryDoc } from './schema'
+import { BoxSchema, DEFAULT_BOX, boxToSolids, solidsToStlBlob } from './box'
+import type { Box } from './box'
+import { JscadViewer } from './viewer/JscadViewer'
+import { useThemeColors } from './viewer/useThemeColors'
+import './App.css'
 
 function App() {
-    const [box, set_box] = useHistoryDoc<Box>(BoxSchema, default_box)
-    const solids = box_to_solids(box) as Geom3[]
-    return <main>
-        <h1>Simple STL Box Generator</h1>
-        <h2>For 3D printers</h2>
-        <AutoForm object={box} schema={BoxSchema} onChange={set_box}/>
-        <nav>
-            <button onClick={() => export_stl(solids)}>Generate STL</button>
-            <a href={"https://github.com/joshmarinacci/boxbuilder"}>GitHub source</a>
-        </nav>
-        <Renderer solids={solids} width={800} height={450}/>
-        <aside>
-            <table>
-                <tr>
-                    <th>action</th> <th>gesture</th>
-                </tr>
-                <tr>
-                    <td>rotate</td> <td>left mouse drag</td>
-                </tr>
-                <tr>
-                    <td>pan</td> <td>shift left mouse drag</td>
-                </tr>
-                <tr>
-                    <td>zoom</td> <td>scroll wheel</td>
-                </tr>
-            </table>
-        </aside>
-    </main>
+    const [box, setBox] = useHistoryDoc<Box>(BoxSchema, DEFAULT_BOX)
+    // CSG is expensive; only rebuild when the box changes, not on unrelated re-renders.
+    const solids = useMemo(() => boxToSolids(box), [box])
+    const colors = useThemeColors()
+    const download = () => forceDownloadBlob('box.stl', solidsToStlBlob(solids))
+
+    return (
+        <>
+            <header>
+                <h1>BoxBuilder</h1>
+                <small>STL boxes with lids for 3D printing</small>
+                <a href="https://github.com/joshmarinacci/boxbuilder">GitHub source</a>
+            </header>
+            <main>
+                <JscadViewer solids={solids} colors={colors} label="Box and lid preview" />
+            </main>
+            <aside>
+                <details open>
+                    <summary>
+                        Box <small>mm</small>
+                    </summary>
+                    <AutoForm schema={BoxSchema} value={box} onChange={setBox} />
+                </details>
+                <fieldset>
+                    <legend>Export</legend>
+                    <button type="submit" onClick={download}>
+                        Download STL
+                    </button>
+                </fieldset>
+            </aside>
+            <footer>
+                <span>
+                    Box{' '}
+                    <output>
+                        {box.width} × {box.depth} × {box.height} mm
+                    </output>
+                </span>
+                <span>Drag: rotate · Shift-drag: pan · Scroll: zoom</span>
+            </footer>
+        </>
+    )
 }
 
-export default App;
+export default App

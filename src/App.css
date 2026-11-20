@@ -1,88 +1,125 @@
+/* tooltheme's app shell targets body > header/main/aside/footer, but React renders inside
+   #root. Until tooltheme can attach the shell to a container, mirror its shell rules here. */
 body {
-  background-color: midnightblue;
-  color: white;
-  --radius: 0.25rem;
+  margin: 0;
 }
 
-main {
-  border: 0px solid red;
+#root {
+  display: grid;
+  height: 100dvh;
+  grid-template:
+    'header header' auto
+    'main   aside' 1fr
+    'footer footer' auto
+    / minmax(0, 1fr) auto;
+}
+
+#root > header {
+  grid-area: header;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: var(--s2);
+  min-height: calc(var(--control) + 8px);
+  padding: 0 var(--s3);
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+}
+#root > header > h1 {
+  margin-right: var(--s3);
+}
+#root > header > small {
+  color: var(--text-muted);
+}
+#root > header > :last-child:not(:first-child) {
+  margin-left: auto;
 }
 
-h1, h2 {
-  margin:0.5rem;
-  padding: 0;
+#root > main {
+  grid-area: main;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  background: var(--surface-0);
 }
 
-nav {
+#root > aside {
+  grid-area: aside;
+  width: var(--inspector);
+  background: var(--surface-1);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+#root > footer {
+  grid-area: footer;
   display: flex;
-  flex-direction: row;
-  border: 1px solid black;
-  background-color: white;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
+  align-items: center;
+  gap: var(--s4);
+  height: calc(var(--fs) + 10px);
+  padding: 0 var(--s3);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  background: var(--surface-1);
+  border-top: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
 }
-nav > * {
-  padding: 0.5rem;
+#root > footer > :last-child:not(:first-child) {
+  margin-left: auto;
 }
-
-
-
-.auto-form, aside {
-  border: 1px solid black;
-  background-color: white;
-  color: black;
-  padding: 1rem;
-  margin: 0.5rem;
+#root > footer output {
+  color: var(--text);
 }
 
-nav, .auto-form, aside {
-  border-radius: var(--radius);
+@media (max-width: 720px) {
+  #root {
+    grid-template:
+      'header' auto
+      'main' 1fr
+      'aside' auto
+      'footer' auto
+      / minmax(0, 1fr);
+  }
+  #root > header > small,
+  #root > footer > :last-child:not(:first-child) {
+    display: none;
+  }
+  #root > aside {
+    width: auto;
+    max-height: 40dvh;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
 }
 
-.auto-form .object-input {
-  display: grid;
-  grid-template-columns: 1fr 2fr 3rem 3rem;
-  min-width: 300px;
+/* App-specific */
+
+/* Range + number box: give the slider the room and keep the number box compact. */
+aside label:has(> input[type='range'] + input[type='number']) {
+  grid-template-columns: 14ch 1fr 7ch;
+}
+aside label > input[type='number'] {
+  width: 100%;
+  min-width: 0;
 }
 
-.row {
-  border: 0px solid blue;
-  display: grid;
-  grid-column: 1 / span 4;
-  grid-template-columns: subgrid;
-  margin: 0.5rem;
+.jscad-viewer {
+  position: absolute;
+  inset: 0;
+  cursor: grab;
 }
-.row :first-child {
-  border: 0px solid green;
-  justify-self: end;
-  padding-right: 0.5rem;
+.jscad-viewer:active {
+  cursor: grabbing;
 }
-.row :last-child {
-  border: 0px solid red;
+.jscad-viewer:focus-visible {
+  outline: var(--focus-w) solid var(--accent-ui);
+  outline-offset: calc(-1 * var(--focus-w));
 }
-
-.row .value {
-  justify-self: end;
-  padding-right: 0.5rem;
-}
-.row input {
-  margin-right: 0.25rem;
-}
-
-
-aside table {
-  border-collapse: collapse;
-  padding:0;
-  margin:0;
-}
-aside table th {
-  background-color: #cccccc;
-  padding: 0.25rem 0.5rem;
-}
-aside table td {
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #cccccc;
+/* tooltheme styles `main canvas` as a page on a pasteboard; the viewer fills main instead. */
+.jscad-viewer canvas {
+  background: none;
+  box-shadow: none;
+  max-width: none;
+  max-height: none;
+  cursor: inherit;
 }
